@@ -1,9 +1,10 @@
 import os
+import traceback
 from flask import Flask, render_template, request, session, redirect, url_for
 import random
 
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = os.environ.get("SECRET_KEY", "secret123")
 
 MOBILE_KEYWORDS = ("android", "iphone", "ipad", "ipod", "mobile", "opera mini", "windows phone")
 
@@ -1024,38 +1025,17 @@ def template_context(language="english", form_data=None, result=None, error=None
 
 @app.route("/")
 def login():
-    if is_mobile_request():
-        return redirect(url_for("home"))
-    language = session.get("language", "english")
-    return render_template("login.html", t=get_translation(language))
+    return redirect(url_for("home"))
 
 
 @app.route("/send_otp", methods=["POST"])
 def send_otp():
-    if is_mobile_request():
-        return redirect(url_for("home"))
-    mobile = request.form["mobile"]
-    otp = random.randint(1000, 9999)
-    session["otp"] = str(otp)
-    session["mobile"] = mobile
-    print("OTP:", otp)
-    return render_template("verify.html", t=get_translation(session.get("language", "english")))
+    return redirect(url_for("home"))
 
 
 @app.route("/verify_otp", methods=["POST"])
 def verify_otp():
-    if is_mobile_request():
-        return redirect(url_for("home"))
-    user_otp = request.form["otp"]
-
-    if user_otp == session.get("otp"):
-        return redirect("/home")
-
-    return render_template(
-        "verify.html",
-        t=get_translation(session.get("language", "english")),
-        error=get_translation(session.get("language", "english"))["invalid_otp"],
-    )
+    return redirect(url_for("home"))
 
 
 @app.route("/home")
@@ -1122,6 +1102,31 @@ def predict():
         "index.html",
         **template_context(language=user_input["language"], form_data=form_data, result=result),
     )
+
+
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    print("Unhandled application error:")
+    traceback.print_exc()
+    language = session.get("language", "english")
+    try:
+        return (
+            render_template(
+                "index.html",
+                **template_context(
+                    language=language,
+                    error="Something went wrong. Please refresh and try again.",
+                ),
+            ),
+            500,
+        )
+    except Exception:
+        return "Application error. Please refresh and try again.", 500
 
 
 if __name__ == "__main__":
