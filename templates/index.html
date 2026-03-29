@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.app_title }}</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: #fffaf2;
+            --panel-strong: #f1e4ce;
+            --ink: #213126;
+            --muted: #5f6f61;
+            --accent: #2d6a4f;
+            --accent-soft: #d8f0d1;
+            --warning: #c16622;
+            --danger: #a63d40;
+            --line: #d8c8ad;
+            --shadow: 0 16px 40px rgba(48, 60, 41, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(94, 160, 91, 0.18), transparent 30%),
+                linear-gradient(135deg, #f6f1e8, #e4efe1 60%, #f3ead9);
+            min-height: 100vh;
+        }
+
+        .page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 24px auto 40px;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, rgba(45, 106, 79, 0.95), rgba(98, 150, 76, 0.85));
+            color: #fffdf7;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            line-height: 1.05;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 760px;
+            color: rgba(255, 253, 247, 0.9);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 250, 242, 0.94);
+            border: 1px solid rgba(216, 200, 173, 0.7);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(6px);
+        }
+
+        .card h2,
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        select,
+        input,
+        button {
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            padding: 12px 14px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        select,
+        input {
+            background: #fff;
+            color: var(--ink);
+        }
+
+        button {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.96;
+        }
+
+        .secondary-btn {
+            background: #d7a44c;
+            color: #2c230e;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            background: var(--panel-strong);
+            color: var(--ink);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+        }
+
+        .status {
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: var(--accent-soft);
+            color: var(--ink);
+            margin-top: 12px;
+        }
+
+        .status.warn {
+            background: #f8e7d4;
+            color: #7b4b1d;
+        }
+
+        .status.error {
+            background: #f6d9d9;
+            color: var(--danger);
+        }
+
+        .result-crop {
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            margin: 8px 0 16px;
+            color: var(--accent);
+        }
+
+        ul {
+            padding-left: 18px;
+            margin-bottom: 0;
+        }
+
+        .fertilizer-panel {
+            display: none;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed var(--line);
+        }
+
+        .fertilizer-panel.open {
+            display: block;
+        }
+
+        .radio-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 12px 0 16px;
+        }
+
+        .radio-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .fert-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mini-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .small {
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 920px) {
+            .grid,
+            .form-grid,
+            .fert-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <h1 id="app-title">{{ t.app_title }}</h1>
+            <p id="subtitle">{{ t.subtitle }}</p>
+        </section>
+
+        <div class="grid">
+            <section class="card">
+                <h2 id="dashboard-label">{{ t.dashboard }}</h2>
+                <form action="/predict" method="post" id="dashboard-form">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="country" id="country-label">{{ t.country }}</label>
+                            <select name="country" id="country">
+                                {% for country in countries %}
+                                <option value="{{ country }}" {% if form_data.country == country %}selected{% endif %}>{{ location_texts.get(country, country) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="region" id="region-label">{{ t.region }}</label>
+                            <select name="region" id="region"></select>
+                        </div>
+
+                        <div class="field">
+                            <label for="season" id="season-label">{{ t.season }}</label>
+                            <select name="season" id="season">
+                                {% for season in seasons %}
+                                <option value="{{ season }}" {% if form_data.season == season %}selected{% endif %}>{{ t[season] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="category" id="preference-label">{{ t.preference }}</label>
+                            <select name="category" id="category">
+                                {% for category in categories %}
+                                <option value="{{ category }}" {% if form_data.category == category %}selected{% endif %}>{{ t[category] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field full">
+                            <label for="language" id="language-label">{{ t.language }}</label>
+                            <select name="language" id="language">
+                                <option value="english" {% if form_data.language == 'english' %}selected{% endif %}>{{ native_language_labels.english }}</option>
+                                <option value="telugu" {% if form_data.language == 'telugu' %}selected{% endif %}>{{ native_language_labels.telugu }}</option>
+                                <option value="tamil" {% if form_data.language == 'tamil' %}selected{% endif %}>{{ native_language_labels.tamil }}</option>
+                                <option value="hindi" {% if form_data.language == 'hindi' %}selected{% endif %}>{{ native_language_labels.hindi }}</option>
+                            </select>
+                        </div>
+
+                        <div class="field full">
+                            <h3 id="soil-title">{{ t.soil_title }}</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="soil_color" id="soil-color-label">{{ t.soil_color }}</label>
+                            <select name="soil_color" id="soil_color">
+                                <option value="black" {% if form_data.soil_color == 'black' %}selected{% endif %}>{{ t.black }}</option>
+                                <option value="red" {% if form_data.soil_color == 'red' %}selected{% endif %}>{{ t.red }}</option>
+                                <option value="brown" {% if form_data.soil_color == 'brown' %}selected{% endif %}>{{ t.brown }}</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="texture" id="texture-label">{{ t.texture }}</label>
+                            <select name="texture" id="texture">
+                                <option value="sticky" {% if form_data.texture == 'sticky' %}selected{% endif %}>{{ t.sticky }}</option>
+                                <option value="dry" {% if form_data.texture == 'dry' %}selected{% endif %}>{{ t.dry }}</option>
+                                <option value="soft" {% if form_data.texture == 'soft' %}selected{% endif %}>{{ t.soft }}</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="water_absorption" id="water-label">{{ t.water_absorption }}</label>
+                            <select name="water_absorption" id="water_absorption">
+                                <option value="fast" {% if form_data.water_absorption == 'fast' %}selected{% endif %}>{{ t.fast }}</option>
+                                <option value="slow" {% if form_data.water_absorption == 'slow' %}selected{% endif %}>{{ t.slow }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="weather_temperature" id="weather_temperature" value="{{ form_data.weather_temperature }}">
+                    <input type="hidden" name="weather_humidity" id="weather_humidity" value="{{ form_data.weather_humidity }}">
+                    <input type="hidden" name="weather_rain_probability" id="weather_rain_probability" value="{{ form_data.weather_rain_probability }}">
+                    <input type="hidden" name="weather_code" id="weather_code" value="{{ form_data.weather_code }}">
+                    <input type="hidden" name="weather_status" id="weather_status" value="{{ form_data.weather_status }}">
+
+                    <div class="status {% if form_data.weather_status != 'ready' %}warn{% endif %}" id="weather-box">
+                        <strong id="weather-title">{{ t.weather_title }}</strong>
+                        <div id="weather-message" class="small">
+                            {% if form_data.weather_status == 'ready' %}
+                                {{ t.weather_ready }}
+                            {% else %}
+                                {{ t.weather_wait }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if error %}
+                    <div class="status error" style="margin-top: 16px;">{{ error }}</div>
+                    {% endif %}
+
+                    <div style="margin-top: 18px;">
+                        <button type="submit" id="predict-btn">{{ t.predict }}</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="card">
+                {% if result %}
+                <h2 id="top-crop-label">{{ t.top_crop }}</h2>
+                <div class="result-crop">{{ result.crop }}</div>
+
+                <h3 id="why-label">{{ t.why }}</h3>
+                <p>{{ result.why }}</p>
+                <ul>
+                    {% for reason in result.reasons %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+
+                {% if result.alternatives %}
+                <h3 id="alternatives-label" style="margin-top: 18px;">{{ t.alternatives }}</h3>
+                <div class="chip-row">
+                    {% for item in result.alternatives %}
+                    <span class="chip">{{ item }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <h3 id="tips-label" style="margin-top: 18px;">{{ t.tips }}</h3>
+                <ul>
+                    {% for tip in result.tips %}
+                    <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+
+                <div style="margin-top: 18px;">
+                    <button type="button" class="secondary-btn" id="fertilizer-toggle">{{ t.fertilizer_button }}</button>
+                </div>
+
+                <div class="fertilizer-panel" id="fertilizer-panel">
+                    <h3 id="fert-title">{{ t.fertilizer_title }}</h3>
+                    <div class="radio-row">
+                        <label class="radio-pill">
+                            <input type="radio" name="fert_choice" value="organic" checked>
+                            <span id="organic-label">{{ t.organic }}</span>
+                        </label>
+                        <label class="radio-pill">
+                            <input type="radio" name="fert_choice" value="chemical">
+                            <span id="chemical-label">{{ t.chemical }}</span>
+                        </label>
+                    </div>
+
+                    <div class="fert-grid">
+                        <div class="mini-card">
+                            <strong id="details-label">{{ t.details }}</strong>
+                            <p id="fert-details" class="muted">{{ result.fertilizer.organic.details }}</p>
+                        </div>
+                        <div class="mini-card">
+                            <strong id="schedule-label">{{ t.schedule }}</strong>
+                            <p id="fert-schedule" class="muted">{{ result.fertilizer.organic.schedule }}</p>
+                        </div>
+                        <div class="mini-card">
+                            <strong id="ratio-label">{{ t.ratio }}</strong>
+                            <p id="fert-ratio" class="muted">{{ result.fertilizer.organic.ratio }}</p>
+                        </div>
+                        <div class="mini-card">
+                            <strong id="method-label">{{ t.method }}</strong>
+                            <p id="fert-method" class="muted">{{ result.fertilizer.organic.method }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <h2 id="weather-card-title">{{ t.weather_title }}</h2>
+                <p class="muted" id="weather-card-copy">{{ t.weather_wait }}</p>
+                <div class="chip-row">
+                    <span class="chip" id="chip-location">{{ t.chip_location }}</span>
+                    <span class="chip" id="chip-season">{{ t.chip_season }}</span>
+                    <span class="chip" id="chip-preference">{{ t.chip_preference }}</span>
+                    <span class="chip" id="chip-soil">{{ t.chip_soil }}</span>
+                    <span class="chip" id="chip-weather">{{ t.chip_weather }}</span>
+                </div>
+                <p class="muted" style="margin-top: 18px;" id="results-placeholder">
+                    {{ t.results_placeholder }}
+                </p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    {% if result %}
+    <script id="fertilizer-data" type="application/json">{{ result.fertilizer | tojson }}</script>
+    {% endif %}
+    <script id="translations-data" type="application/json">{{ translations | tojson }}</script>
+    <script id="regions-data" type="application/json">{{ regions_by_country | tojson }}</script>
+    <script id="location-texts-data" type="application/json">{{ all_location_texts | tojson }}</script>
+    <script id="native-language-labels-data" type="application/json">{{ native_language_labels | tojson }}</script>
+    <script>
+        const translations = JSON.parse(document.getElementById("translations-data").textContent);
+        const regionsByCountry = JSON.parse(document.getElementById("regions-data").textContent);
+        const locationTexts = JSON.parse(document.getElementById("location-texts-data").textContent);
+        const nativeLanguageLabels = JSON.parse(document.getElementById("native-language-labels-data").textContent);
+        const selectedRegion = {{ form_data.region | tojson }};
+
+        const textTargets = [
+            ["app-title", "app_title"],
+            ["subtitle", "subtitle"],
+            ["dashboard-label", "dashboard"],
+            ["country-label", "country"],
+            ["region-label", "region"],
+            ["season-label", "season"],
+            ["preference-label", "preference"],
+            ["language-label", "language"],
+            ["soil-title", "soil_title"],
+            ["soil-color-label", "soil_color"],
+            ["texture-label", "texture"],
+            ["water-label", "water_absorption"],
+            ["weather-title", "weather_title"],
+            ["predict-btn", "predict"],
+            ["top-crop-label", "top_crop"],
+            ["why-label", "why"],
+            ["alternatives-label", "alternatives"],
+            ["tips-label", "tips"],
+            ["fertilizer-toggle", "fertilizer_button"],
+            ["fert-title", "fertilizer_title"],
+            ["organic-label", "organic"],
+            ["chemical-label", "chemical"],
+            ["details-label", "details"],
+            ["schedule-label", "schedule"],
+            ["ratio-label", "ratio"],
+            ["method-label", "method"],
+            ["weather-card-title", "weather_title"],
+            ["weather-card-copy", "weather_wait"],
+            ["chip-location", "chip_location"],
+            ["chip-season", "chip_season"],
+            ["chip-preference", "chip_preference"],
+            ["chip-soil", "chip_soil"],
+            ["chip-weather", "chip_weather"],
+            ["results-placeholder", "results_placeholder"],
+        ];
+
+        function getLangPack() {
+            const lang = document.getElementById("language").value || "english";
+            return translations[lang] || translations.english;
+        }
+
+        function getLocationLabel(value) {
+            const lang = document.getElementById("language").value || "english";
+            return (locationTexts[lang] && locationTexts[lang][value]) || value;
+        }
+
+        function populateRegions() {
+            const country = document.getElementById("country").value;
+            const regionSelect = document.getElementById("region");
+            const regions = regionsByCountry[country] || [];
+            regionSelect.innerHTML = "";
+
+            regions.forEach((region) => {
+                const option = document.createElement("option");
+                option.value = region;
+                option.textContent = getLocationLabel(region);
+                if (region === selectedRegion || region === regionSelect.dataset.pending) {
+                    option.selected = true;
+                }
+                regionSelect.appendChild(option);
+            });
+        }
+
+        function updateStaticText() {
+            const langPack = getLangPack();
+            textTargets.forEach(([id, key]) => {
+                const element = document.getElementById(id);
+                if (element && langPack[key]) {
+                    element.textContent = langPack[key];
+                }
+            });
+
+            document.querySelectorAll("#season option").forEach((option) => {
+                option.textContent = langPack[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#category option").forEach((option) => {
+                option.textContent = langPack[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#language option").forEach((option) => {
+                option.textContent = nativeLanguageLabels[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#soil_color option").forEach((option) => {
+                option.textContent = langPack[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#texture option").forEach((option) => {
+                option.textContent = langPack[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#water_absorption option").forEach((option) => {
+                option.textContent = langPack[option.value] || option.value;
+            });
+
+            document.querySelectorAll("#country option").forEach((option) => {
+                option.textContent = getLocationLabel(option.value);
+            });
+
+            populateRegions();
+
+            const weatherStatus = document.getElementById("weather_status").value;
+            const weatherMessage = document.getElementById("weather-message");
+            if (weatherMessage) {
+                if (weatherStatus === "ready") {
+                    weatherMessage.textContent = langPack.weather_ready;
+                } else if (weatherStatus === "failed") {
+                    weatherMessage.textContent = langPack.weather_fallback;
+                } else {
+                    weatherMessage.textContent = langPack.weather_wait;
+                }
+            }
+        }
+
+        async function detectWeather() {
+            if (!navigator.geolocation) {
+                markWeatherFailed();
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code&daily=precipitation_probability_max&forecast_days=1&timezone=auto`;
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    const current = data.current || {};
+                    const daily = data.daily || {};
+
+                    document.getElementById("weather_temperature").value = current.temperature_2m ?? "";
+                    document.getElementById("weather_humidity").value = current.relative_humidity_2m ?? "";
+                    document.getElementById("weather_code").value = current.weather_code ?? "";
+                    document.getElementById("weather_rain_probability").value = (daily.precipitation_probability_max || [])[0] ?? "";
+                    document.getElementById("weather_status").value = "ready";
+
+                    const langPack = getLangPack();
+                    const box = document.getElementById("weather-box");
+                    box.classList.remove("warn");
+                    document.getElementById("weather-message").textContent =
+                        `${langPack.weather_ready} ${langPack.temp_label}: ${current.temperature_2m ?? "-"}\u00B0C, ${langPack.humidity_label}: ${current.relative_humidity_2m ?? "-"}%, ${langPack.rain_chance_label}: ${((daily.precipitation_probability_max || [])[0] ?? "-")}%`;
+                } catch (error) {
+                    markWeatherFailed();
+                }
+            }, () => {
+                markWeatherFailed();
+            });
+        }
+
+        function markWeatherFailed() {
+            document.getElementById("weather_status").value = "failed";
+            const box = document.getElementById("weather-box");
+            box.classList.add("warn");
+            document.getElementById("weather-message").textContent = getLangPack().weather_fallback;
+        }
+
+        function setupFertilizerPanel() {
+            const toggleButton = document.getElementById("fertilizer-toggle");
+            const panel = document.getElementById("fertilizer-panel");
+            const dataNode = document.getElementById("fertilizer-data");
+            if (!toggleButton || !panel || !dataNode) {
+                return;
+            }
+
+            const fertilizerData = JSON.parse(dataNode.textContent);
+            const details = document.getElementById("fert-details");
+            const schedule = document.getElementById("fert-schedule");
+            const ratio = document.getElementById("fert-ratio");
+            const method = document.getElementById("fert-method");
+
+            function updateFertilizer(choice) {
+                const plan = fertilizerData[choice];
+                details.textContent = plan.details;
+                schedule.textContent = plan.schedule;
+                ratio.textContent = plan.ratio;
+                method.textContent = plan.method;
+            }
+
+            toggleButton.addEventListener("click", () => {
+                panel.classList.toggle("open");
+            });
+
+            document.querySelectorAll('input[name="fert_choice"]').forEach((radio) => {
+                radio.addEventListener("change", (event) => {
+                    updateFertilizer(event.target.value);
+                });
+            });
+        }
+
+        document.getElementById("country").addEventListener("change", () => {
+            document.getElementById("region").dataset.pending = "";
+            populateRegions();
+        });
+
+        document.getElementById("language").addEventListener("change", () => {
+            updateStaticText();
+            if (document.getElementById("fertilizer-data")) {
+                document.getElementById("dashboard-form").requestSubmit();
+            }
+        });
+
+        populateRegions();
+        updateStaticText();
+        detectWeather();
+        setupFertilizerPanel();
+    </script>
+</body>
+</html>

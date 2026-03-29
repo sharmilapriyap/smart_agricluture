@@ -1,0 +1,17 @@
+<h2>{{ msg }}</h2>
+<h1>{{ crop }}</h1>
+
+<h3>Suggestions:</h3>
+<ul>
+{% for t in tips %}
+<li>{{ t }}</li>
+{% endfor %}
+</ul>
+
+<form action="/fertilizer" method="post">
+<input type="hidden" name="crop" value="{{ crop }}">
+<input type="radio" name="ftype" value="organic">Organic
+<input type="radio" name="ftype" value="chemical">Chemical
+<br>
+<button>Fertilizer</button>
+</form>

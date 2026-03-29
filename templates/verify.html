@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.verify }}</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #e8f0e3, #f7eadc);
+            font-family: Georgia, "Segoe UI", sans-serif;
+            color: #223127;
+        }
+
+        .card {
+            width: min(420px, calc(100% - 32px));
+            background: rgba(255, 252, 246, 0.96);
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(44, 63, 46, 0.12);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input {
+            border: 1px solid #d7c9b2;
+            margin-bottom: 14px;
+        }
+
+        button {
+            border: none;
+            background: #2d6a4f;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .error {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f6d9d9;
+            color: #9d3138;
+        }
+    </style>
+</head>
+<body>
+    <form class="card" action="/verify_otp" method="post">
+        <h2>{{ t.enter_otp }}</h2>
+        <input type="text" name="otp" placeholder="{{ t.enter_otp }}" required>
+        <button type="submit">{{ t.verify }}</button>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+    </form>
+</body>
+</html>
